@@ -5,6 +5,7 @@ A current FreeWili Linux image should already include `fwcm0` and the
 
 ```sh
 systemctl status fwcm0-bridge --no-pager
+fwcm0 help
 fwcm0 status
 ls -l /run/fwcm0-bridge.sock
 ```
@@ -13,6 +14,9 @@ The socket is normally `root:dialout`, mode `0660`. Add your application user
 to `dialout` if needed, then log out and back in. Do not make the socket world
 writable. If another API/interactive-console app owns the channel, close it
 before starting another. The Linux shell itself can remain open.
+`fwcm0 help` must list `api`; older images may only have `console` and need
+the driver upgrade below. After Python setup, `python3 tools/fw.py doctor`
+checks the CLI and an actual read-only MAIN response.
 
 ## Rebuild the driver when needed
 

@@ -12,9 +12,9 @@ Initial verification, 2026-09-26:
 | Check | Result |
 | --- | --- |
 | Windows MinGW driver core and application installer | Passed CTest |
-| OneWili Python, C and Rust regression suites | Passed Windows, macOS and Linux CI |
-| BSP macOS/Linux host builds and socket tests | CI configured; initial run pending |
-| Linux libgpiod 2.x driver build | CI configured; initial run pending |
+| OneWili Python, C and Rust regression suites | [Passed Windows, macOS and Linux CI](https://github.com/freewili/onewili/actions/runs/36252998900): 1,195 Python tests, C binary tests, 9 Rust tests |
+| BSP Windows/MSVC, macOS and Linux host builds/tests | [Passed](https://github.com/freewili/wilicm0bsp/actions/runs/36252938786): 59 driver cases, 3 installer cases; Linux/macOS also run 3 socket cases |
+| Linux libgpiod 2.x driver build and staged install | Passed on Debian Trixie in CI |
 | CM0 ARM64 build and real mailbox examples | In progress before release |
 
 CI exercises the socket adapter against a simulated local bridge; it cannot

@@ -3,6 +3,7 @@ import importlib.util
 from pathlib import Path
 import tempfile
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 
 spec = importlib.util.spec_from_file_location("fw", Path(__file__).resolve().parents[1] / "tools/fw.py")
@@ -11,6 +12,17 @@ spec.loader.exec_module(fw)
 
 
 class AppTools(unittest.TestCase):
+    def test_driver_preflight_detects_old_cli(self):
+        with patch.object(fw.shutil, "which", return_value="fwcm0"), patch.object(fw.subprocess, "run") as run:
+            run.return_value = SimpleNamespace(stdout="commands:\n  console  interactive\n")
+            with self.assertRaisesRegex(RuntimeError, "too old"):
+                fw.check_driver()
+            run.return_value = SimpleNamespace(stdout="commands:\n  api  isolated OneWili\n")
+            fw.check_driver()
+        with patch.object(fw.shutil, "which", return_value=None):
+            with self.assertRaisesRegex(RuntimeError, "missing"):
+                fw.check_driver()
+
     def test_names_cannot_escape_apps_directory(self):
         for value in ("../escape", "/tmp/app", "name;rm", "with space", "", "A", "x" * 41):
             with self.assertRaises(argparse.ArgumentTypeError):

@@ -26,12 +26,14 @@ sudo apt-get install -y git python3 python3-pip
 git clone --recurse-submodules https://github.com/freewili/wilicm0bsp.git
 cd wilicm0bsp
 python3 tools/fw.py setup
+python3 tools/fw.py doctor
 python3 tools/fw.py run hello_python
 ```
 
 The setup command installs a local Python runtime in `.runtime/`. It leaves
 system Python alone and needs no root access. OneWili uses `fwcm0 api` and the
 running bridge. No USB connection to a PC is required for the application.
+If `doctor` reports an old driver, follow [the driver upgrade steps](docs/driver.md).
 
 If `/home/apps` does not yet exist, create it for your Linux login user:
 
@@ -121,3 +123,12 @@ existing polled receive command on CM0.
 
 License: [MIT](LICENSE). Third-party dependencies retain their own licenses;
 see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+
+## Downloads
+
+[Releases](https://github.com/freewili/wilicm0bsp/releases) provide a source
+archive that includes the pinned OneWili sources, plus ready-to-copy example
+app folders. GitHub's automatic source ZIP omits Git submodules; use the
+attached `wilicm0bsp-*-source.tar.gz` or clone with `--recurse-submodules`.
+Extract an example app archive into `/home/apps/` on CM0 and select its
+`run.sh` in Linux > Apps. Native example binaries target ARM64 Linux.

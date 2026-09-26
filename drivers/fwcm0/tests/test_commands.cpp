@@ -1,0 +1,11 @@
+#include <gtest/gtest.h>
+#include "fwcm0/commands.h"
+using namespace fwcm0; using B = std::vector<uint8_t>;
+TEST(Commands, Builders) {
+  EXPECT_EQ(cmd_write_at(0x123456, {0xAA,0xBB}), (B{0x02,0x12,0x34,0x56,0xAA,0xBB}));
+  EXPECT_EQ(cmd_write_cont({0xCC}),              (B{0x0A,0xCC}));
+  EXPECT_EQ(cmd_read_at(0x21, 0x0ABCDE, 16),     (B{0x03,0x21,0x0A,0xBC,0xDE,0x00,0x10}));
+  EXPECT_EQ(cmd_read_cont(0x22, 8),              (B{0x0B,0x22,0x00,0x08}));
+  EXPECT_EQ(cmd_status(0x44),                    (B{0x05,0x44}));
+  EXPECT_EQ(cmd_swap_request(),                  (B{0x06}));
+}

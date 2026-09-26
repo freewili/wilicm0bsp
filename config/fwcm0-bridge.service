@@ -1,0 +1,21 @@
+# FreeWili MAIN<->CM0 bridge - ENABLED by default (product father-board link): serves
+# a bash PTY over the FPGA mailbox (TYPE_SHELL) and a local socket for `fwcm0 console`
+# + register ops. Stop it only to use the raw register tools without the socket relay.
+[Unit]
+Description=fwcm0 bridge - CM0 bash shell + console/register relay over the FPGA mailbox
+After=basic.target
+
+[Service]
+Type=simple
+# systemd does NOT read /etc/environment (that's PAM/login-only), so pull FWCM0_BAUD
+# (= 7.8125 Mbaud to match the gateware) + any FWCM0_* overrides from there explicitly.
+EnvironmentFile=-/etc/environment
+ExecStart=/usr/local/bin/fwcm0 bridge
+Restart=on-failure
+RestartSec=5
+AmbientCapabilities=CAP_SYS_NICE CAP_IPC_LOCK
+# /run/fwcm0-bridge.sock is created dialout 0660 by the daemon itself (an
+# ExecStartPost chgrp would race the bind, which waits on the FPGA boot poll).
+
+[Install]
+WantedBy=multi-user.target

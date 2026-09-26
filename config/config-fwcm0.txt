@@ -1,0 +1,15 @@
+# fwcm0 CM0 router config (appended to /boot/firmware/config.txt).
+# Verified on the ED-CM0NANO carrier (Raspbian Trixie, libgpiod 2.x).
+# Bounded by the BEGIN/END markers so the provisioner is idempotent.
+# --- fwcm0 BEGIN ---
+# Pin the unconditional section so the block applies on the BCM2837 even if the base
+# config.txt ends inside a [cm4]/[cm5] filter (silently skipped on this board).
+[all]
+enable_uart=1
+dtoverlay=disable-bt
+dtoverlay=spi0-0cs
+gpio=16,17=a3
+# PL011 uartclk = 125 MHz so the FPGA-link baud (125M/16 = 7.8125 Mbaud, matching the
+# gateware) is generatable; stock 48 MHz tops out ~3 Mbaud. Pair with FWCM0_BAUD=7812500.
+init_uart_clock=125000000
+# --- fwcm0 END ---

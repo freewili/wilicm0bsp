@@ -1,0 +1,3 @@
+[submodule "libs/onewili"]
+	path = libs/onewili
+	url = https://github.com/freewili/onewili.git

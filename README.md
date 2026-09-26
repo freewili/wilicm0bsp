@@ -16,7 +16,9 @@ DISPLAY apps and is a separate location.
 
 Use a current FreeWili 2 Linux image with a working `fwcm0-bridge` service and
 matching MAIN firmware (mailbox protocol 1.2 or newer). Enable Linux/CM0 and
-FPGA power through the device's power controls, then wait for Linux to boot.
+FPGA power through the device's power controls (or from a PC with
+`python tools/deploy.py cm0 on`; see [PC deployment](docs/deploy.md)), then
+wait for Linux to boot.
 Open the Linux Console in FreeWili GUI, the device terminal, or an SSH session
 you have configured. The commands below run **inside CM0 Linux**.
 
@@ -51,6 +53,11 @@ after moving or deleting this source checkout. Launch output is saved under
 ls -t ~/.local/state/freewili/apps/app-*.log | head
 ```
 
+**From a PC over the USB cable to MAIN** (no network or SSH), install and start
+an app with `python tools/deploy.py install hello_python --run` after
+`pip install pyserial` and `python tools/fw.py setup` on the PC. Disconnect
+FreeWili GUI first; see [PC deployment](docs/deploy.md).
+
 Do not run the installer with sudo. If an existing apps folder is not writable,
 ask its owner to grant your user access. Installation refuses to replace an
 existing app. `--apps-dir <path>` creates a staging folder for copying to CM0.
@@ -81,6 +88,7 @@ concurrently. A second app receives a busy error.
 | `apps/hello_python` | Read MAIN Device State; no hardware settings changed |
 | `apps/gpio_poll` | Ten GPIO snapshots; FPGA power must be on |
 | `apps/device_info` | Native C++ app using generated OneWili C calls over the bridge |
+| `apps/wifi_analyzer` | Passive 2.4/5 GHz Wi-Fi survey with a USB adapter, shown on the screen |
 | `apps/template` | Minimal Python starter copied by `new-app` |
 | `drivers/fwcm0/examples` | Lower-level router examples; read the driver guide first |
 
@@ -108,7 +116,9 @@ or take over SPI/UART. See [the architecture guide](docs/architecture.md).
 - [Driver setup and troubleshooting](docs/driver.md): rebuild `fwcm0`, systemd,
   permissions, and hardware ownership.
 - [Application and launcher contract](docs/apps.md): launch behavior, logs,
-  storage, deployment, and standalone app repositories.
+  storage, using the screen through OneWili, deployment, and standalone app repositories.
+- [PC deployment](docs/deploy.md): `tools/deploy.py` and `tools/fwlink.py` install,
+  run, stop and inspect apps from Windows, macOS or Linux over MAIN USB.
 - [AGENTS.md](AGENTS.md): instructions for coding agents and contributors;
   [agent references](agents/README.md) cover development and hardware limits.
 - [Platform and verification status](docs/platform-support.md).

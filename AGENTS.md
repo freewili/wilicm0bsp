@@ -10,13 +10,17 @@ It does not build RP2350 firmware or DISPLAY UF2 applications.
   CLI and bridge, examples, and mock-based tests.
 - `libs/onewili/`: pinned public Git submodule. Never hand-edit generated bindings.
 - `tools/fw.py`: Python setup, scaffolding, running and installation.
+- `tools/deploy.py`, `tools/fwlink.py`: PC-side install/run/log over the MAIN USB
+  Linux shell tunnel. Never replay a timed-out shell or menu write.
 
 Read [development](agents/development.md), [hardware and transports](agents/hardware.md),
 and [the app contract](docs/apps.md). Keep app instructions and examples runnable
 from a fresh recursive clone with no private repositories or absolute build paths.
 
 Apps belong in **`/home/apps/<app-name>/` on CM0 Linux**, with a `run.sh` entry.
-This is the folder the Linux Apps launcher opens. Installed apps must not rely
+This is the folder the Linux Apps launcher opens. An app must work when `run.sh` is launched with
+no arguments and no terminal; interactive apps use the screen through OneWili
+(see [the app contract](docs/apps.md)). Installed apps must not rely
 on the build checkout or an interactive terminal. Put persistent app data under
 the launch user's `~/.local/share/<app-name>/`, not alongside executables.
 

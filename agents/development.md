@@ -25,3 +25,8 @@ Generated API changes belong upstream in OneWili's generator. Update its
 submodule only after the upstream commit is published. New dependencies must
 be pinned and accessible to customers. Keep testing records clear about the
 specific firmware/image combination tested.
+
+For a source release, commit the changes and run
+`python3 tools/package.py dist/wilicm0bsp-source.tar.gz`. It reads the committed
+tree and its pinned submodule, omits Git metadata, and normalizes timestamps.
+Verify the archive includes `libs/onewili` before attaching it to a release.

@@ -39,3 +39,7 @@ archives normalize file timestamps to avoid clock-skew build warnings.
 FTDI binary event forwarding and USB directory-list events are not implemented
 on CM0. Firmware peripheral behavior beyond the examples is not exhaustively
 tested.
+
+Additional [application integration field notes](integration-notes.md) record
+2026-09-26 observations with a custom firmware profile and a USB Wi-Fi adapter,
+including unresolved USB faults. They are separate from the BSP checks above.

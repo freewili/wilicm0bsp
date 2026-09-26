@@ -57,3 +57,10 @@ The portable driver core and tests work without hardware on Windows/macOS/Linux.
 The SPI/UART transport and bridge require Linux and the actual FreeWili wiring.
 The copied driver sources are maintained in this repository; changes here
 must keep its socket and mailbox protocols compatible with shipping firmware.
+
+## Integration field notes
+
+See [CM0 integration and recovery notes](integration-notes.md) for paired clock
+settings, USB host-mode maintenance, hotplug recovery, and cold-boot validation
+lessons from an application integration. The custom clock profile described
+there requires matching firmware; the BSP reference defaults are unchanged.

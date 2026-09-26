@@ -44,10 +44,30 @@ def new_app(name):
     print(destination)
 
 
+def check_driver():
+    executable = shutil.which("fwcm0")
+    if not executable:
+        raise RuntimeError("fwcm0 is missing. Run this on CM0 Linux; see docs/driver.md to install the driver.")
+    result = subprocess.run([executable, "help"], capture_output=True, text=True, timeout=5, check=True)
+    if not re.search(r"^\s*api\s", result.stdout, re.MULTILINE):
+        raise RuntimeError("Installed fwcm0 is too old (no api command). Rebuild and restart the bridge using docs/driver.md.")
+
+
+def doctor():
+    check_driver()
+    if not (RUNTIME / "onewili_cm0.py").is_file():
+        raise RuntimeError("Run python3 tools/fw.py setup first.")
+    sys.path.insert(0, str(RUNTIME))
+    from onewili_cm0 import connect_cm0
+    with connect_cm0() as device:
+        print("Mailbox API ready:", device.hardware.system.device_state().unwrap())
+
+
 def run_app(name):
     source = ROOT / "apps" / app_name(name) / "app.py"
     if not (RUNTIME / "onewili_cm0.py").is_file():
         raise RuntimeError("Run python3 tools/fw.py setup first.")
+    check_driver()
     env = dict(os.environ, PYTHONPATH=str(RUNTIME) + os.pathsep + os.environ.get("PYTHONPATH", ""))
     subprocess.run([sys.executable, "-u", str(source)], cwd=source.parent, env=env, check=True)
 
@@ -97,6 +117,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("setup", help="Prepare a local, relocatable Python runtime")
+    sub.add_parser("doctor", help="Check the installed bridge CLI and a read-only MAIN API call")
     new = sub.add_parser("new-app", help="Create a Python application from the template")
     new.add_argument("name", type=app_name)
     run = sub.add_parser("run", help="Run a Python app on the CM0")
@@ -108,10 +129,11 @@ def main():
     args = parser.parse_args()
     try:
         if args.command == "setup": setup()
+        elif args.command == "doctor": doctor()
         elif args.command == "new-app": new_app(args.name)
         elif args.command == "run": run_app(args.name)
         else: install_app(args.name, args.apps_dir, args.build_dir)
-    except (OSError, RuntimeError, subprocess.CalledProcessError) as error:
+    except (OSError, RuntimeError, subprocess.SubprocessError) as error:
         parser.exit(1, str(error) + "\n")
 
 

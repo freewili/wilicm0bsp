@@ -21,7 +21,7 @@ Use one application thread at a time for a Device instance.
 The mailbox allows 511 command text bytes and 4,095 captured reply bytes.
 File transfers use bounded framed menu operations with CRC/size checks.
 Python `device.files.put/get/put_file/get_file` use those operations on CM0.
-C++ can include `onewili_framed_files.h` from OneWili's `cm0/include` for the
+C++ can include `onewili_framed_files.h` from the linked OneWili C package for the
 same protocol. Only one file-transfer session is supported at a time.
 
 Binary streaming decoders are available in upstream OneWili, but there is no

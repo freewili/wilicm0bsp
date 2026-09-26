@@ -21,6 +21,7 @@ jobs:
       - run: ctest --test-dir build -C Release --output-on-failure
       - run: python tools/fw.py setup
       - run: python tools/fw.py install hello_python --apps-dir dist/apps
+      - run: python tools/fw.py install wifi_analyzer --apps-dir dist/apps
   linux-driver:
     runs-on: ubuntu-latest
     container: debian:trixie

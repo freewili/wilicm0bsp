@@ -40,6 +40,58 @@ FTDI binary event forwarding and USB directory-list events are not implemented
 on CM0. Firmware peripheral behavior beyond the examples is not exhaustively
 tested.
 
+## PC deployment tools and Wi-Fi analyzer example
+
+Added on the `feature/wifi-analyzer-and-pc-deploy` branch:
+
+| Check | Result |
+| --- | --- |
+| `tools/deploy.py` / `tools/fwlink.py` against a simulated MAIN framed shell | Passed on Windows (Python 3.12): reply parsing, 192-byte chunking, exit codes, checksum-verified upload, install, overwrite refusal, `--replace` backup, cleanup |
+| Staging `wifi_analyzer` on Windows | Passed: 238 KiB zip with bundled runtime |
+| `wifi_analyzer` parsing/analysis (`iw` and `nmcli` formats) | Passed 12 unit tests on Windows |
+| Deploy tools on a real FreeWili 2 over MAIN USB (Windows host, COM port) | **Passed** `info`, `shell`, `log`, `install` (240 KiB in 12 s, SHA-256 verified), `install --replace` with backup, `run` |
+| `deploy.py cm0 status` | **Passed**: zones, control lines; `l\u` gave no reply (image lacks runtime USB switching) |
+| `deploy.py cm0 reset --force` | **Refused by MAIN** on the test unit: `CM0_RUNPG did not read back held in reset`; CM0 unchanged |
+| `deploy.py cm0 power-cycle --force` | **Passed** (zone 17 off/on accepted); did not clear a MAIN-side shell `EBUSY` |
+| `wifi_analyzer` panel on the device screen | **Passed**: panel drawn and captured with `gui.screenshot` ("No Wi-Fi adapter" state) |
+| `deploy.py cm0 on` (GUI power sequence) | **Passed** after a cold boot: rail and RUN acknowledged, Linux booted |
+| `deploy.py cm0 reboot` with boot-id check | **Passed** (the first version's backgrounded reboot died with the session; fixed with `setsid`) |
+| USB host mode via `setup_usb_host.py` + reboot | **Passed**: `g_serial` gone; TP-Link Archer T3U (2357:012d) enumerated as `wlan0` |
+| `wifi_analyzer` scan on the device | Reports "Wi-Fi radio is off": NetworkManager's radio was disabled and the regulatory domain unset (`00`). A real AP survey is **not yet verified** |
+| `wifi_analyzer` keypad stop and launch from the Apps menu on the glass | **Not yet verified** |
+| macOS and Linux hosts for these additions | Not yet run; expected through CI |
+
+Hardware findings on the test unit (CM0 Rev 1.0, kernel 6.12.75+rpt-rpi-v8):
+
+- The first `wifi_analyzer` build exited when one `read_buttons()` mailbox
+  request timed out while the PC tunnel was active; in isolation the call took
+  10 ms. The panel now tolerates lost replies and reconnects (unit-tested).
+- `/home/apps` was `root:root 755`, so the console user could not install;
+  it was changed to `pi:pi` with the owner's approval, as the README intends.
+- `config.txt` carried a host-mode dwc2 line under `[cm5]` and the CM0's
+  peripheral line under `[all]`. `setup_usb_host.py` now edits only `[all]`.
+- MAIN firmware fix (`rpCM0Comm::linkReset` releases a framed shell session and
+  drops an undelivered detach): verified on the device with a MAIN build from
+  the firmware working tree. An abandoned session blocked a new one with
+  `EBUSY`; after an FPGA-power link reset the new session opened 8.5 s later,
+  before the 30 s lease. The fix is not yet in released MAIN firmware.
+- After CM0 or MAIN restarts, `fwcm0-bridge` twice failed with `router timeout`
+  (FPGA mailbox not answering). An FPGA power cycle fixed it once; a full device
+  reset the second time. Root cause not established.
+- Opening a shell session immediately after closing one returns `EBUSY` until
+  the detach reaches CM0; `fwlink` retries for up to 10 s.
+- After a separate OneWili USB session on the same port, one shell session
+  stopped draining input and MAIN then answered `EBUSY` to new sessions beyond
+  the documented 30-second release. MAIN firmware refuses a new session while
+  a previous detach is undelivered; a CM0 power cycle did not clear it, so
+  recovery needs a MAIN restart (see [PC deployment](deploy.md#a-stuck-shell-session-ebusy-close-the-active-linux-shell-first)).
+
+The simulated MAIN reproduces the framed-menu protocol used by FreeWili GUI's
+Linux Console and fwcom's hardware scripts; it does not model MAIN firmware
+timing, flow control, or CM0 shell differences. The OneWili GUI calls in the
+Wi-Fi example match the pinned OneWili signatures and the sequence used by a
+hardware-validated community integration, but have not been run from this BSP.
+
 Additional [application integration field notes](integration-notes.md) record
 2026-09-26 observations with a custom firmware profile and a USB Wi-Fi adapter,
 including unresolved USB faults. They are separate from the BSP checks above.

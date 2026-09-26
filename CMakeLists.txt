@@ -27,6 +27,10 @@ if(BUILD_TESTING)
   find_package(Python3 REQUIRED COMPONENTS Interpreter)
   add_test(NAME app_tools COMMAND ${Python3_EXECUTABLE}
     -m unittest discover -s ${CMAKE_CURRENT_SOURCE_DIR}/tests -p test_tools.py)
+  add_test(NAME pc_deploy COMMAND ${Python3_EXECUTABLE}
+    -m unittest discover -s ${CMAKE_CURRENT_SOURCE_DIR}/tests -p test_deploy.py)
+  add_test(NAME wifi_analyzer COMMAND ${Python3_EXECUTABLE}
+    -m unittest discover -s ${CMAKE_CURRENT_SOURCE_DIR}/tests -p test_wifi_analyzer.py)
   if(UNIX)
     add_executable(socket_probe tests/socket_probe.cpp)
     target_link_libraries(socket_probe PRIVATE wilicm0)

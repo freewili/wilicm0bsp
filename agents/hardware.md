@@ -20,5 +20,8 @@ The low-level `fwcm0::LinuxTransport`, router examples and OneWili's direct
 driver maintenance and restart it afterward. Prefer `wilicm0::Device` for apps.
 
 FPGA is power zone 6; CM0 is zone 17; CM0 RUN is control line 19. Do not cut
-CM0 power while Linux is writing. Shut Linux down first. Other peripheral power
+CM0 power while Linux is writing. Shut Linux down first. From a PC,
+`tools/deploy.py cm0 status|reboot|usb` wraps these MAIN controls; its
+`cm0 reset --force` (RUN line) is only for an unreachable CM0 and may be
+refused by MAIN. See [PC deployment](../docs/deploy.md). Other peripheral power
 requirements are enforced by MAIN and reported as `EPOWERZONE` failures.
